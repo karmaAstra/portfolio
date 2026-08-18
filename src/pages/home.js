@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 
 function Home() {
   const [tasks, setTasks] = useState([
@@ -7,6 +8,9 @@ function Home() {
     { id: 3, text: 'Deploy the project online', completed: false },
   ]);
   const [inputTask, setInputTask] = useState('');
+  
+  // State for the QR code generator tool
+  const [qrText, setQrText] = useState('https://example.com');
 
   // Add a new task
   const handleAddTask = (e) => {
@@ -42,55 +46,85 @@ function Home() {
       {/* Hero Section */}
       <div style={styles.hero}>
         <div style={styles.badge}>Welcome Home</div>
-        <h1 style={styles.title}>Manage Your Day, Your Way</h1>
+        <h1 style={styles.title}>Manage Your Day & Share Links</h1>
         <p style={styles.subtitle}>
-          Stay organized and boost your productivity with your built-in interactive to-do list.
+          Stay organized with your to-do list and quickly generate QR codes on the fly.
         </p>
       </div>
 
-      {/* To-Do List Container */}
-      <div style={styles.todoCard}>
-        <h2 style={styles.todoTitle}>📝 Today's Tasks</h2>
+      <div style={styles.gridContainer}>
+        {/* To-Do List Container */}
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>📝 Today's Tasks</h2>
 
-        {/* Input Form */}
-        <form onSubmit={handleAddTask} style={styles.form}>
-          <input
-            type="text"
-            placeholder="Add a new task..."
-            value={inputTask}
-            onChange={(e) => setInputTask(e.target.value)}
-            style={styles.input}
-          />
-          <button type="submit" style={styles.addButton}>Add Task</button>
-        </form>
+          {/* Input Form */}
+          <form onSubmit={handleAddTask} style={styles.form}>
+            <input
+              type="text"
+              placeholder="Add a new task..."
+              value={inputTask}
+              onChange={(e) => setInputTask(e.target.value)}
+              style={styles.input}
+            />
+            <button type="submit" style={styles.addButton}>Add Task</button>
+          </form>
 
-        {/* Task List */}
-        <ul style={styles.list}>
-          {tasks.length === 0 ? (
-            <p style={styles.emptyText}>No tasks left! Enjoy your day 🎉</p>
-          ) : (
-            tasks.map((task) => (
-              <li key={task.id} style={styles.listItem}>
-                <span
-                  onClick={() => toggleTask(task.id)}
-                  style={{
-                    ...styles.taskText,
-                    textDecoration: task.completed ? 'line-through' : 'none',
-                    color: task.completed ? '#9ca3af' : '#1f2937',
-                  }}
-                >
-                  {task.completed ? '✅ ' : '⬜ '} {task.text}
-                </span>
-                <button 
-                  onClick={() => deleteTask(task.id)} 
-                  style={styles.deleteButton}
-                >
-                  Delete
-                </button>
-              </li>
-            ))
-          )}
-        </ul>
+          {/* Task List */}
+          <ul style={styles.list}>
+            {tasks.length === 0 ? (
+              <p style={styles.emptyText}>No tasks left! Enjoy your day 🎉</p>
+            ) : (
+              tasks.map((task) => (
+                <li key={task.id} style={styles.listItem}>
+                  <span
+                    onClick={() => toggleTask(task.id)}
+                    style={{
+                      ...styles.taskText,
+                      textDecoration: task.completed ? 'line-through' : 'none',
+                      color: task.completed ? '#9ca3af' : '#1f2937',
+                    }}
+                  >
+                    {task.completed ? '✅ ' : '⬜ '} {task.text}
+                  </span>
+                  <button 
+                    onClick={() => deleteTask(task.id)} 
+                    style={styles.deleteButton}
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+
+        {/* QR Code Generator Card */}
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>📱 QR Code Generator</h2>
+          <p style={styles.qrDesc}>Type a website link or text below to instantly generate a scannable QR code:</p>
+          
+          <div style={styles.form}>
+            <input
+              type="text"
+              placeholder="Enter URL or text..."
+              value={qrText}
+              onChange={(e) => setQrText(e.target.value)}
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.qrDisplayBox}>
+            <QRCodeSVG 
+              value={qrText || 'https://example.com'} 
+              size={180} 
+              bgColor={"#ffffff"}
+              fgColor={"#111827"}
+              level={"H"}
+              includeMargin={true}
+            />
+            <p style={styles.qrValueText}>Scans to: <b>{qrText || 'Empty'}</b></p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -108,7 +142,7 @@ const styles = {
   },
   hero: {
     textAlign: 'center',
-    padding: '60px 20px 40px 20px',
+    padding: '50px 20px 30px 20px',
     maxWidth: '700px',
     margin: '0 auto',
   },
@@ -125,29 +159,44 @@ const styles = {
     letterSpacing: '0.5px',
   },
   title: {
-    fontSize: '38px',
+    fontSize: '36px',
     fontWeight: '800',
     color: '#111827',
-    marginBottom: '12px',
+    marginBottom: '10px',
   },
   subtitle: {
     fontSize: '16px',
     color: '#4b5563',
   },
-  todoCard: {
-    maxWidth: '600px',
+  gridContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '30px',
+    maxWidth: '1100px',
     margin: '0 auto',
+    padding: '0 20px',
+    flexWrap: 'wrap',
+  },
+  card: {
+    flex: '1',
+    minWidth: '300px',
+    maxWidth: '500px',
     backgroundColor: '#ffffff',
     padding: '30px',
     borderRadius: '16px',
     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
     border: '1px solid #e5e7eb',
   },
-  todoTitle: {
+  cardTitle: {
     fontSize: '22px',
     fontWeight: '700',
     color: '#1f2937',
-    marginBottom: '20px',
+    marginBottom: '15px',
+  },
+  qrDesc: {
+    fontSize: '14px',
+    color: '#4b5563',
+    marginBottom: '15px',
   },
   form: {
     display: 'flex',
@@ -209,6 +258,23 @@ const styles = {
     textAlign: 'center',
     color: '#6b7280',
     padding: '20px 0',
+  },
+  qrDisplayBox: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '20px',
+    backgroundColor: '#f9fafb',
+    borderRadius: '12px',
+    border: '1px solid #e5e7eb',
+  },
+  qrValueText: {
+    marginTop: '15px',
+    fontSize: '13px',
+    color: '#4b5563',
+    wordBreak: 'break-all',
+    textAlign: 'center',
   },
 };
 
